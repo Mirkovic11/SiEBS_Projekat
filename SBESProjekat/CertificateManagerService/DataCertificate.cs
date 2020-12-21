@@ -164,7 +164,7 @@ namespace CertificateManagerService
             {
                 if (x509.Subject == subjectName)
                 {
-                    Debug.Print(string.Format("certificate name: {0}", x509.Subject));
+                    
                     //byte[] pfxByte = x509.Export(X509ContentType.Pfx, password);     
                     byte[] cerByte = x509.Export(X509ContentType.Cert);
                     using (FileStream fileStream = new FileStream(cerFileName, FileMode.Create))
