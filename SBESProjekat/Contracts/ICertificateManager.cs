@@ -13,5 +13,11 @@ namespace Contracts
         [OperationContract]
         void createTrustedRootCA(string trustedRootName);
 
+        [OperationContract]
+        void createCertificateWithallKeys(string trustedRootName, string certificateName);
+
+        [OperationContract]
+        void createCertificateWithoutPrivateKey(string trustedRootName, string certificateName);
+
     }
 }

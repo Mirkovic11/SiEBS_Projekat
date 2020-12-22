@@ -27,11 +27,19 @@ namespace WCFClient
                 //Credentials.Windows.AllowNtlm = false;
             }
 
-            
+            public void createCertificateWithallKeys(string trustedRootName, string certificateName)
+            {
+                factory.createCertificateWithallKeys(trustedRootName,certificateName);
+            }
+
+            public void createCertificateWithoutPrivateKey(string trustedRootName, string certificateName)
+            {
+                factory.createCertificateWithoutPrivateKey(trustedRootName, certificateName);
+            }
 
             public void createTrustedRootCA(string trustedRootName)
             {
-                factory.createTrustedRootCA(trustedRootName);
+                    factory.createTrustedRootCA(trustedRootName);
             }
         }
 }

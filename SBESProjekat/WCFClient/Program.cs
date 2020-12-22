@@ -28,9 +28,11 @@ namespace WCFClient
 
             using (ClientProxy proxy = new ClientProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {
-                Console.WriteLine("Unesi ime Trusted root-a");
-                string rootName = Console.ReadLine();
-                proxy.createTrustedRootCA(rootName);
+                Console.WriteLine("Unesi ime sertifikata koji zelis da napravis");
+                string certName = Console.ReadLine();
+                proxy.createTrustedRootCA("TestCA");
+                //proxy.createCertificateWithallKeys("TestCA", certName);
+                proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                 
             }
 
