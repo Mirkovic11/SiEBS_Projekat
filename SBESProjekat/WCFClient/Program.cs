@@ -24,11 +24,13 @@ namespace WCFClient
             //EndpointAddress endpointAddress = new EndpointAddress(new Uri(address), EndpointIdentity.CreateUpnIdentity("wcfservice"));
 
             Console.WriteLine("Korisnik koji je pokrenuo klijenta: " + WindowsIdentity.GetCurrent().Name);
-
+           
 
             using (ClientProxy proxy = new ClientProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {
-                proxy.AddUser("pera", "peric");
+                Console.WriteLine("Unesi ime Trusted root-a");
+                string rootName = Console.ReadLine();
+                proxy.createTrustedRootCA(rootName);
                 
             }
 

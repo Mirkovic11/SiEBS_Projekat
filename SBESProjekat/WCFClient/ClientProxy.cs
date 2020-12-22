@@ -10,9 +10,9 @@ namespace WCFClient
 {
     
 
-        public class ClientProxy : ChannelFactory<ICommunication>, ICommunication, IDisposable
+        public class ClientProxy : ChannelFactory<ICertificateManager>, ICertificateManager, IDisposable
         {
-            ICommunication factory;
+            ICertificateManager factory;
 
             public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
             {
@@ -27,18 +27,11 @@ namespace WCFClient
                 //Credentials.Windows.AllowNtlm = false;
             }
 
-            public void AddUser(string username, string password)
+            
+
+            public void createTrustedRootCA(string trustedRootName)
             {
-
-                try
-                {
-                    factory.AddUser(username, password);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error: {0}", e.Message);
-                }
+                factory.createTrustedRootCA(trustedRootName);
             }
-
         }
 }
