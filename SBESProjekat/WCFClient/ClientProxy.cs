@@ -13,6 +13,7 @@ namespace WCFClient
         public class ClientProxy : ChannelFactory<ICertificateManager>, ICertificateManager, IDisposable
         {
             ICertificateManager factory;
+           
 
             public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
             {
@@ -41,5 +42,7 @@ namespace WCFClient
             {
                     factory.createTrustedRootCA(trustedRootName);
             }
+
+        
         }
 }

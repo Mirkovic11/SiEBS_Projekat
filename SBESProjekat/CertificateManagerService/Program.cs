@@ -19,7 +19,7 @@ namespace CertificateManagerService
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9999/Contracts";
+            string address = "net.tcp://localhost:9999/ICertificateManager";
 
 
             Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
@@ -30,6 +30,10 @@ namespace CertificateManagerService
 
             host.Open();
             Console.WriteLine("CertificateManagerService je pokrenut");
+
+            DataCertificate dc = new DataCertificate();
+            dc.createTrustedRootCA("TestCA");
+
             Console.ReadLine();
 
         }
