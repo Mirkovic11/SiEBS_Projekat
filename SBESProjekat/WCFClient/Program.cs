@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
@@ -13,18 +15,24 @@ namespace WCFClient
         static void Main(string[] args)
         {
 
+            string srvCertCN = "wcfservice";
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
+
             NetTcpBinding binding = new NetTcpBinding();
             NetTcpBinding binding2 = new NetTcpBinding();
             string address = "net.tcp://localhost:9999/ICertificateManager";
-            string address2 = "net.tcp://localhost:9998/IWcfService";
 
-            binding.Security.Mode = SecurityMode.Transport;
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
-            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
 
-            //za NTLM dodatno, meni nece raditi
-            //EndpointAddress endpointAddress = new EndpointAddress(new Uri(address), EndpointIdentity.CreateUpnIdentity("wcfservice"));
+            EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://localhost:9998/IWcfService"),
+                                      new X509CertificateEndpointIdentity(srvCert));
 
+
+            binding2.Security.Mode = SecurityMode.Transport;
+            binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+           
+
+
+            
             Console.WriteLine("Korisnik koji je pokrenuo klijenta: " + WindowsIdentity.GetCurrent().Name);
            
 
