@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
@@ -13,11 +14,15 @@ namespace WCFService
     {
         static void Main(string[] args)
         {
+            string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);//naziv je dodjeljen po korisniku koji je pokrenuo proces,pozivamo fju ParseName kako bi dobili naziv serverkog sertifikata
+
             NetTcpBinding binding = new NetTcpBinding();
             NetTcpBinding binding2 = new NetTcpBinding();
+            binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
             string address = "net.tcp://localhost:9999/ICertificateManager";
             string address2 = "net.tcp://localhost:9998/IWcfService";
-
+           
 
             using (ServiceProxy proxy = new ServiceProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {
@@ -47,7 +52,19 @@ namespace WCFService
                         case 3:
                             ServiceHost host = new ServiceHost(typeof(WcfSevice));
                             host.AddServiceEndpoint(typeof(IWcfService), binding2, address2);
+
+                           // try { 
+
+                            host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+
+                            host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
+                            
                             host.Open();
+                           // }
+                           // catch (Exception e)
+                           // {
+                               // throw new Exception("pukao sam - server.");
+                           // }
                             Console.WriteLine("Server podignut");
                             break;
                     }
