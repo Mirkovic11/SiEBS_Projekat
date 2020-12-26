@@ -18,14 +18,18 @@ namespace WCFClient
             string srvCertCN = "wcfservice";
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
 
-            NetTcpBinding binding = new NetTcpBinding();
             NetTcpBinding binding2 = new NetTcpBinding();
-            string address = "net.tcp://localhost:9999/ICertificateManager";
 
 
             EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://localhost:9998/IWcfService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://localhost:9999/ICertificateManager";
+
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
             binding2.Security.Mode = SecurityMode.Transport;
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;

@@ -17,13 +17,19 @@ namespace WCFService
         {
             string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);//naziv je dodjeljen po korisniku koji je pokrenuo proces,pozivamo fju ParseName kako bi dobili naziv serverkog sertifikata
 
-            NetTcpBinding binding = new NetTcpBinding();
             NetTcpBinding binding2 = new NetTcpBinding();
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
-            string address = "net.tcp://localhost:9999/ICertificateManager";
+            
             string address2 = "net.tcp://localhost:9998/IWcfService";
-           
+            //connect to cms
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://localhost:9999/ICertificateManager";
+
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+
 
             using (ServiceProxy proxy = new ServiceProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {

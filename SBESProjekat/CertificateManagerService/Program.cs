@@ -21,6 +21,9 @@ namespace CertificateManagerService
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:9999/ICertificateManager";
 
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
             Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
 
