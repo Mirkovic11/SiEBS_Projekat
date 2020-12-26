@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,11 @@ namespace WCFService
             factory = this.CreateChannel();
             //zabraniti izvrsavanje autentifikacije putem NTLM protokola
             //Credentials.Windows.AllowNtlm = false;
+        }
+
+        public void AddToRevocationList(X509Certificate2 cert)
+        {
+            factory.AddToRevocationList(cert);
         }
 
         public void createCertificateWithallKeys(string trustedRootName, string certificateName)
