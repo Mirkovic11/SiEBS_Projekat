@@ -15,7 +15,8 @@ namespace CertificateManagerService
 {
     public sealed class DataCertificate : ICertificateManager
     {
-        
+     
+
         public void createCertificateWithallKeys(string trustedRootName, string certificateName)
         {
             Process p = new Process();
@@ -94,5 +95,45 @@ namespace CertificateManagerService
             }
 
         }
-    }
+
+        public void AddToRevocationList(X509Certificate2 cert)
+        {
+            List<string> Lista = new List<string>();
+            bool nadjeno = false;
+            //if(!File.Exists("RevocationList.txt"))
+          //  {
+             //   File.Create("RevocationList.txt");
+           // }
+            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    Lista.Add(line);
+                }
+            }
+            
+            foreach (string item in Lista)
+            {
+                if (item == cert.Thumbprint)
+                {
+                    nadjeno = true;
+                    break;
+                }
+            }
+            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//RevocationList.txt", true))
+            {
+                
+                if(!nadjeno)
+                {
+                    sw.WriteLine(cert.Thumbprint);
+                }
+                else
+                {
+                    Console.WriteLine("Sertifikat je vec povucen.\n");
+                }
+                  
+            }
+        }
+    } 
 }

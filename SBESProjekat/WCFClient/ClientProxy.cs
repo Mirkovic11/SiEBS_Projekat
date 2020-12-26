@@ -33,6 +33,11 @@ namespace WCFClient
 
         }
 
+        public void AddToRevocationList(X509Certificate2 cert)
+            {
+                factory.AddToRevocationList(cert);
+            }
+
         public void createCertificateWithallKeys(string trustedRootName, string certificateName)
             {
                 factory.createCertificateWithallKeys(trustedRootName,certificateName);

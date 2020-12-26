@@ -45,7 +45,7 @@ namespace WCFClient
 
                 do
                 {
-                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 izlaz");
+                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 konekcija sa serverom, 4 povlacenje sertifikata, 0 za izlaz");
                     int.TryParse(Console.ReadLine(), out option);
 
                     switch (option)
@@ -61,13 +61,25 @@ namespace WCFClient
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
+                            try { 
                             using (ClientProxyService proxy2 = new ClientProxyService(binding2, address2))
                             {
                                 Console.WriteLine(proxy2.TestCommunication()); 
                             }
+                            }
+                            catch
+                            {
+
+                            }
                             break;
+                        case 4:
+                            string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
+                            proxy.AddToRevocationList(certificate);
+                            break;
+
                     }
-                } while (option != 3);
+                } while (option != 0);
              
             }
 

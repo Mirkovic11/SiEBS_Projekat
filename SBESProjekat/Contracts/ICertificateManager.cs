@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,5 +20,7 @@ namespace Contracts
         [OperationContract]
         void createCertificateWithoutPrivateKey(string trustedRootName, string certificateName);
 
+        [OperationContract]
+        void AddToRevocationList(X509Certificate2 cert);
     }
 }
