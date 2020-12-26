@@ -22,7 +22,8 @@ namespace CertificateManagerService
             Process p = new Process();
             string makecertPath = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\makecert.exe";
             string username = Thread.CurrentPrincipal.Identity.Name.Split('\\')[1];
-            string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username+ "\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
+            string groups = GetUserGroups((Thread.CurrentPrincipal.Identity as WindowsIdentity));
+            string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username+ ",OU="+groups+"\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
 
             ProcessStartInfo startInfo = new ProcessStartInfo(makecertPath, commmand);
             p.StartInfo = startInfo;
@@ -61,7 +62,8 @@ namespace CertificateManagerService
             Process p = new Process();
             string makecertPath = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\makecert.exe";
             string username = Thread.CurrentPrincipal.Identity.Name.Split('\\')[1];
-            string command = "-iv "+trustedRootName+".pvk -n \"CN = "+username+"\" -ic "+trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
+            string groups = GetUserGroups((Thread.CurrentPrincipal.Identity as WindowsIdentity));
+            string command = "-iv "+trustedRootName+".pvk -n \"CN = "+username+ ",OU=" + groups + "\" -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
             
 
             ProcessStartInfo startInfo = new ProcessStartInfo(makecertPath, command);
@@ -136,5 +138,29 @@ namespace CertificateManagerService
                   
             }
         }
+
+        private string GetUserGroups(WindowsIdentity windowsIdentity)
+        {
+            string groups = "";
+            foreach (IdentityReference group in windowsIdentity.Groups)
+            {
+                SecurityIdentifier sid = (SecurityIdentifier)group.Translate(typeof(SecurityIdentifier));
+                var name = sid.Translate(typeof(NTAccount)).ToString();
+                name = Formatter.ParseName(name);
+
+
+                if (name == "RegionWest" || name == "RegionEast" || name == "RegionNorth" || name == "RegionSouth")
+                {
+                    if (groups != "")
+                        groups += "_" + name;
+                    else
+                        groups = name;
+                }
+            }
+
+            return groups;
+        }
+
+
     } 
 }

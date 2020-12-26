@@ -29,10 +29,9 @@ namespace WCFClient
 
             binding2.Security.Mode = SecurityMode.Transport;
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-           
-
 
             
+
             Console.WriteLine("Korisnik koji je pokrenuo klijenta: " + WindowsIdentity.GetCurrent().Name);
            
 
