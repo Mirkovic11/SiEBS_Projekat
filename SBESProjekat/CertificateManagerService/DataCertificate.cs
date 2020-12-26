@@ -96,7 +96,7 @@ namespace CertificateManagerService
 
         }
 
-        public void AddToRevocationList(X509Certificate2 cert)
+        public string AddToRevocationList(X509Certificate2 cert)
         {
             List<string> Lista = new List<string>();
             bool nadjeno = false;
@@ -127,10 +127,11 @@ namespace CertificateManagerService
                 if(!nadjeno)
                 {
                     sw.WriteLine(cert.Thumbprint);
+                    return "Sertifikat povucen!";
                 }
                 else
                 {
-                    Console.WriteLine("Sertifikat je vec povucen.\n");
+                    return "Sertifikat je vec povucen.\n";
                 }
                   
             }

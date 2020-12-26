@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -53,22 +54,59 @@ namespace WCFService
                             ServiceHost host = new ServiceHost(typeof(WcfSevice));
                             host.AddServiceEndpoint(typeof(IWcfService), binding2, address2);
 
-                           // try { 
 
-                            host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+                            string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
-                            host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
+                            List<string> Lista = new List<string>();
+                            bool nadjeno = false;
+                            string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
+                            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
+                            {
+                                string line;
+                                while ((line = sr.ReadLine()) != null)
+                                {
+                                    Lista.Add(line);
+                                }
+                            }
+
+                            foreach (string item in Lista)
+                            {
+                                if (item == certificate.Thumbprint)
+                                {
+                                    nadjeno = true;
+                                    break;
+                                }
+                            }
+                            if (nadjeno)
+                            {
+                                Console.WriteLine("Nemate sertifikat.");
+                                break;
+                            }
+                            else
+                            {
+                                host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+
+                                host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
+
+                                host.Open();
+
+                                Console.WriteLine("Server podignut");
+                                break;
+                            }
+
+
+                           
                             
-                            host.Open();
-                           // }
-                           // catch (Exception e)
-                           // {
-                               // throw new Exception("pukao sam - server.");
-                           // }
-                            Console.WriteLine("Server podignut");
+
+                        case 4:
+                            string myName1 = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                            X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);
+                            Console.WriteLine(proxy.AddToRevocationList(certificate1) ); 
                             break;
+
                     }
-                } while (option != 3);
+                } while (option != 0);
 
             }
 

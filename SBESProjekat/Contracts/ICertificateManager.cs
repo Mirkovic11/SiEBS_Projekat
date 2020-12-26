@@ -21,6 +21,6 @@ namespace Contracts
         void createCertificateWithoutPrivateKey(string trustedRootName, string certificateName);
 
         [OperationContract]
-        void AddToRevocationList(X509Certificate2 cert);
+        string AddToRevocationList(X509Certificate2 cert);
     }
 }

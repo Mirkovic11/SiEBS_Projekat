@@ -75,7 +75,7 @@ namespace WCFClient
                         case 4:
                             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
-                            proxy.AddToRevocationList(certificate);
+                            Console.WriteLine(proxy.AddToRevocationList(certificate) ); 
                             break;
 
                     }
