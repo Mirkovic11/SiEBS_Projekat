@@ -64,6 +64,17 @@ namespace WCFClient
 
         }
 
+        public void PingServer(DateTime dt, string name, string cn)
+        {
+            try
+            {
+                factory.PingServer(dt, name, cn);
+            }catch(Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+        }
+
         public string TestCommunication()
             {
                 return factory.TestCommunication();
