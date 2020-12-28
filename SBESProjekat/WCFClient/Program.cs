@@ -21,7 +21,7 @@ namespace WCFClient
 
             NetTcpBinding binding2 = new NetTcpBinding();
 
-
+           
             EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://localhost:9998/IWcfService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
@@ -71,9 +71,10 @@ namespace WCFClient
                                 Console.WriteLine(proxy2.TestCommunication()); 
                             
                             }
-                            catch
+                            catch(Exception e)
                             {
-
+                                Console.WriteLine(e.ToString());
+                                //Console.WriteLine("Ne radim");
                             }
                             break;
                         case 4:
@@ -87,9 +88,13 @@ namespace WCFClient
                             
                                 Console.WriteLine("Starting to ping server...");
                                 string name=WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-                                Console.WriteLine("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +WindowsIdentity.GetCurrent().Name.Split('\\')[1]);
+                                
                                 X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
-                                string CN = cert.Subject;
+                                if (cert == null)
+                                {
+                                    Console.WriteLine("Nema sertifikata");
+                                }
+                                string CN = cert.SubjectName.Name.Split(',')[0];
                                 Console.WriteLine(CN);
                                 Random r = new Random();
                                 try
@@ -103,6 +108,7 @@ namespace WCFClient
                                 }
                                 catch (Exception ex)
                                 {
+                                    Console.WriteLine("evo me");
                                     Console.WriteLine(ex.Message);
                                 }
                            /* }catch

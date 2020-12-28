@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -15,6 +16,8 @@ namespace WCFService
         
         private System.Timers.Timer disconnectTimer = new System.Timers.Timer();
 
+
+        //[PrincipalPermission(SecurityAction.Demand, Role = "Zlatna")]
         public void PingServer(DateTime dt, string name, string cn)
         {
             int brojac = 0;
@@ -62,6 +65,8 @@ namespace WCFService
                 Console.WriteLine("Klijent"+name+" se javio "+dt.ToString()+"\n");
         }
 
+
+        //[PrincipalPermission(SecurityAction.Demand, Role = "Zlatna")]
         public string TestCommunication()
         {
             return "Komunikacija je uspostavljena!";

@@ -24,12 +24,16 @@ namespace WCFClient
             public ClientProxyService(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
             {
 
+
+
             string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            
 
             List<string> Lista = new List<string>();
             bool nadjeno = false;
             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
+            Console.WriteLine(certificate.Subject);
             using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
             {
                 string line;
@@ -54,10 +58,14 @@ namespace WCFClient
             else
             {
                 Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+                
                 this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+               
 
                 this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+                
                 factory = this.CreateChannel();
+               
             }          
             //zabraniti izvrsavanje autentifikacije putem NTLM protokola
             //Credentials.Windows.AllowNtlm = false;
@@ -69,6 +77,7 @@ namespace WCFClient
             try
             {
                 factory.PingServer(dt, name, cn);
+
             }catch(Exception e)
             {
                 Console.WriteLine("Exception: " + e.Message);
