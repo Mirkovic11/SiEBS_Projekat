@@ -65,57 +65,67 @@ namespace WCFClient
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
-                            try {
-
-                                ClientProxyService proxy2 = new ClientProxyService(binding2, address2);
-                                Console.WriteLine(proxy2.TestCommunication()); 
-                            
-                            }
-                            catch(Exception e)
+                            ClientProxyService proxy2 = new ClientProxyService(binding2, address2);
+                            try
                             {
-                                Console.WriteLine(e.ToString());
-                                //Console.WriteLine("Ne radim");
+
+
+                                Console.WriteLine(proxy2.TestCommunication());
+
+                            }
+                            catch
+                            {
+
                             }
                             break;
                         case 4:
                             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
-                            Console.WriteLine(proxy.AddToRevocationList(certificate) ); 
+                            if (certificate == null)
+                            {
+                                Console.WriteLine("Sertifikat je vec povucen");
+                            }
+                            else
+                            {
+                                Console.WriteLine(proxy.AddToRevocationList(certificate));
+                            }
+
                             break;
                         case 5:
-                          //  try { 
-                                ClientProxyService proxy3 = new ClientProxyService(binding2, address2);
-                            
-                                Console.WriteLine("Starting to ping server...");
-                                string name=WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-                                
-                                X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
-                                if (cert == null)
-                                {
-                                    Console.WriteLine("Nema sertifikata");
-                                }
-                                string CN = cert.SubjectName.Name.Split(',')[0];
-                                Console.WriteLine(CN);
-                                Random r = new Random();
-                                try
-                                {
-                                    while (true)
-                                    {
-                                        Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
+                            //  try { 
+                            ClientProxyService proxy3 = new ClientProxyService(binding2, address2);
 
-                                        proxy3.PingServer(DateTime.Now,name,CN);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.WriteLine("evo me");
-                                    Console.WriteLine(ex.Message);
-                                }
-                           /* }catch
+                            Console.WriteLine("Starting to ping server...");
+                            string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+
+
+                            X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
+                            if (cert == null)
                             {
-                                Console.WriteLine("Ne radim!");
-                            }*/
-                                break;
+                                Console.WriteLine("Nema sertifikata");
+                            }
+                            string CN = cert.SubjectName.Name.Split(',')[0];
+                            Console.WriteLine(CN);
+                            Random r = new Random();
+                            try
+                            {
+                                while (true)
+                                {
+                                    Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
+
+                                    proxy3.PingServer(DateTime.Now, name, CN);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("evo me");
+                                Console.WriteLine(ex.Message);
+                            }
+                            /* }catch
+                             {
+                                 Console.WriteLine("Ne radim!");
+                             }*/
+                            break;
 
                     }
                 } while (option != 0);

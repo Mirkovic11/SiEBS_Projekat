@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -9,36 +10,28 @@ namespace Contracts
 {
     public class CertManager
     {
-        /*public static X509Certificate2 GetCertificateFromStorage(StoreName storeName, StoreLocation storeLocation, string subjectName)
-        {
-            X509Store store = new X509Store(storeName, storeLocation);//da l' valjda napravimo objekat u kome se skladiste sertifikati
-            store.Open(OpenFlags.ReadOnly);//samo citamo sertifikate
-                                           //po cemu trazimo //samo one koji su validni
-            X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);//za pronalazenje sertifikata koji nam treba
-
-            /// Check whether the subjectName of the certificate is exactly the same as the given "subjectName"
-            foreach (X509Certificate2 c in certCollection)//prolazimo kroz svaki sertifikat
-            {
-                if (c.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))//provjeravamo da li je
-                {
-                    return c;
-                }
-            }
-
-            return null;
-        }*/
-
         public static X509Certificate2 GetCertificateFromStorage(StoreName storeName, StoreLocation storeLocation, string subjectName)
         {
+            List<string> Lista = new List<string>();
             X509Store store = new X509Store(storeName, storeLocation);
             store.Open(OpenFlags.ReadOnly);
 
             X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
+            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    Lista.Add(line);
+                }
+            }
+
 
             /// Check whether the subjectName of the certificate is exactly the same as the given "subjectName"
             foreach (X509Certificate2 c in certCollection)
             {
                 string CN = "";
+                bool nadjeno = false;
                 if (c.SubjectName.Name.Contains(','))
                 {
                     CN = c.SubjectName.Name.Split(',')[0];
@@ -46,7 +39,18 @@ namespace Contracts
 
                 if (CN.Equals(string.Format("CN={0}", subjectName)))
                 {
-                    return c;
+                    foreach (string item in Lista)
+                    {
+                        if (item == c.Thumbprint)
+                        {
+                            nadjeno = true;
+                        }
+                    }
+                    if (!nadjeno)
+                    {
+                        return c;
+                    }
+
                 }
             }
 

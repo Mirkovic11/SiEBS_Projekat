@@ -21,52 +21,38 @@ namespace WCFClient
                 factory = this.CreateChannel();
             }
 
-            public ClientProxyService(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
-            {
-
-
+        public ClientProxyService(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
+        {
 
             string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
-            
+
 
             List<string> Lista = new List<string>();
             bool nadjeno = false;
             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
-            Console.WriteLine(certificate.Subject);
-            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    Lista.Add(line);
-                }
-            }
 
-            foreach (string item in Lista)
+            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
+
+            if (certificate == null)
             {
-                if (item == certificate.Thumbprint)
-                {
-                    nadjeno = true;
-                    break;
-                }
-            }
-            if (nadjeno)
-            {
-                Console.WriteLine("Nemate sertifikat.");
+                Console.WriteLine("nemate sertifikat");
             }
             else
             {
                 Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
-                
+
                 this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-               
+
 
                 this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
-                
+
                 factory = this.CreateChannel();
-               
-            }          
+            }
+
+
+
+
+
             //zabraniti izvrsavanje autentifikacije putem NTLM protokola
             //Credentials.Windows.AllowNtlm = false;
 

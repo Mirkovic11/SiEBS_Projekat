@@ -67,27 +67,10 @@ namespace WCFService
                             bool nadjeno = false;
                             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
-                            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
-                            {
-                                string line;
-                                while ((line = sr.ReadLine()) != null)
-                                {
-                                    Lista.Add(line);
-                                }
-                            }
 
-                            foreach (string item in Lista)
+                            if (certificate == null)
                             {
-                                if (item == certificate.Thumbprint)
-                                {
-                                    nadjeno = true;
-                                    break;
-                                }
-                            }
-                            if (nadjeno)
-                            {
-                                Console.WriteLine("Nemate sertifikat.");
-                                break;
+                                Console.WriteLine("Nemate sertifikat");
                             }
                             else
                             {
@@ -98,13 +81,10 @@ namespace WCFService
                                 host.Open();
 
                                 Console.WriteLine("Server podignut");
-                                break;
                             }
 
 
-                           
-                            
-
+                            break;
                         case 4:
                             string myName1 = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);

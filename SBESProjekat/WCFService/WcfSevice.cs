@@ -13,17 +13,18 @@ namespace WCFService
 {
     public class WcfSevice : IWcfService
     {
-        
+
         private System.Timers.Timer disconnectTimer = new System.Timers.Timer();
 
 
-        //[PrincipalPermission(SecurityAction.Demand, Role = "Zlatna")]
+
         public void PingServer(DateTime dt, string name, string cn)
         {
             int brojac = 0;
             List<string> korisnici = new List<string>();
-            try { 
-                using(StreamReader sr=new StreamReader("..//..//..//Lista//JavljanjeKlijenata.txt"))
+            try
+            {
+                using (StreamReader sr = new StreamReader("..//..//..//Lista//JavljanjeKlijenata.txt"))
                 {
                     string line;
                     while ((line = sr.ReadLine()) != null)
@@ -32,10 +33,11 @@ namespace WCFService
                     }
 
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("Nema kreiran txt");
-                
+
             }
 
             foreach (string item in korisnici)
@@ -46,27 +48,27 @@ namespace WCFService
             brojac++;
             using (StreamWriter sw = new StreamWriter("..//..//..//Lista//JavljanjeKlijenata.txt", true))
             {
-                sw.WriteLine("<"+brojac+">:<"+dt+">:<"+cn+">");
+                sw.WriteLine("<" + brojac + ">:<" + dt + ">:<" + cn + ">");
             }
-                /*
+            /*
 
-                            if (disconnectTimer.Enabled)
-                            {
-                                disconnectTimer.Stop();
+                        if (disconnectTimer.Enabled)
+                        {
+                            disconnectTimer.Stop();
 
-                                disconnectTimer.Start();
-                            }
+                            disconnectTimer.Start();
+                        }
 
 
-                            disconnectTimer.Interval = 10000;
-                            disconnectTimer.Enabled = true;
-                            disconnectTimer.AutoReset = false;*/
+                        disconnectTimer.Interval = 10000;
+                        disconnectTimer.Enabled = true;
+                        disconnectTimer.AutoReset = false;*/
 
-                Console.WriteLine("Klijent"+name+" se javio "+dt.ToString()+"\n");
+            Console.WriteLine("Klijent" + name + " se javio " + dt.ToString() + "\n");
         }
 
 
-        //[PrincipalPermission(SecurityAction.Demand, Role = "Zlatna")]
+
         public string TestCommunication()
         {
             return "Komunikacija je uspostavljena!";
