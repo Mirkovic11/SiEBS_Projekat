@@ -9,7 +9,7 @@ namespace Contracts
 {
     public class CertManager
     {
-        public static X509Certificate2 GetCertificateFromStorage(StoreName storeName, StoreLocation storeLocation, string subjectName)
+        /*public static X509Certificate2 GetCertificateFromStorage(StoreName storeName, StoreLocation storeLocation, string subjectName)
         {
             X509Store store = new X509Store(storeName, storeLocation);//da l' valjda napravimo objekat u kome se skladiste sertifikati
             store.Open(OpenFlags.ReadOnly);//samo citamo sertifikate
@@ -26,6 +26,32 @@ namespace Contracts
             }
 
             return null;
+        }*/
+
+        public static X509Certificate2 GetCertificateFromStorage(StoreName storeName, StoreLocation storeLocation, string subjectName)
+        {
+            X509Store store = new X509Store(storeName, storeLocation);
+            store.Open(OpenFlags.ReadOnly);
+
+            X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
+
+            /// Check whether the subjectName of the certificate is exactly the same as the given "subjectName"
+            foreach (X509Certificate2 c in certCollection)
+            {
+                string CN = "";
+                if (c.SubjectName.Name.Contains(','))
+                {
+                    CN = c.SubjectName.Name.Split(',')[0];
+                }
+
+                if (CN.Equals(string.Format("CN={0}", subjectName)))
+                {
+                    return c;
+                }
+            }
+
+            return null;
         }
+
     }
 }

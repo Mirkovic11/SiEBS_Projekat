@@ -23,8 +23,10 @@ namespace CertificateManagerService
             string makecertPath = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\makecert.exe";
             string username = Thread.CurrentPrincipal.Identity.Name.Split('\\')[1];
             string groups = GetUserGroups((Thread.CurrentPrincipal.Identity as WindowsIdentity));
-            string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username+ ",OU="+groups+"\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
-
+            //string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username+ "\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
+            string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username + ",OU=" + groups + "\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
+            
+            Console.WriteLine(commmand);
             ProcessStartInfo startInfo = new ProcessStartInfo(makecertPath, commmand);
             p.StartInfo = startInfo;
             try
@@ -149,7 +151,7 @@ namespace CertificateManagerService
                 name = Formatter.ParseName(name);
 
 
-                if (name == "RegionWest" || name == "RegionEast" || name == "RegionNorth" || name == "RegionSouth")
+                if (name == "Zlatna")
                 {
                     if (groups != "")
                         groups += "_" + name;
