@@ -58,11 +58,11 @@ namespace WCFClient
 
         }
 
-        public void PingServer(DateTime dt, string name, string cn)
+        public void PingServer(DateTime dt, string name, string cn, string grupa)
         {
             try
             {
-                factory.PingServer(dt, name, cn);
+                factory.PingServer(dt, name, cn, grupa);
 
             }catch(Exception e)
             {

@@ -97,7 +97,7 @@ namespace WCFClient
 
                             Console.WriteLine("Starting to ping server...");
                             string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-
+                            
 
                             X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
                             if (cert == null)
@@ -105,6 +105,7 @@ namespace WCFClient
                                 Console.WriteLine("Nema sertifikata");
                             }
                             string CN = cert.SubjectName.Name.Split(',')[0];
+                            string grupa = cert.SubjectName.Name.Split(',')[1];
                             Console.WriteLine(CN);
                             Random r = new Random();
                             try
@@ -113,7 +114,7 @@ namespace WCFClient
                                 {
                                     Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
 
-                                    proxy3.PingServer(DateTime.Now, name, CN);
+                                    proxy3.PingServer(DateTime.Now, name, CN, grupa);
                                 }
                             }
                             catch (Exception ex)

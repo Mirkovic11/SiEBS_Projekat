@@ -151,7 +151,9 @@ namespace CertificateManagerService
                 name = Formatter.ParseName(name);
 
 
-                if (name == "Zlatna")
+
+                if (name == "RegionEast" || name == "RegionWest"
+                    || name == "RegionNorth" || name == "RegionSouth")
                 {
                     if (groups != "")
                         groups += "_" + name;

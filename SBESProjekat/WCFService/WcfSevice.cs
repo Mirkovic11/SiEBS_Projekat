@@ -14,57 +14,88 @@ namespace WCFService
     public class WcfSevice : IWcfService
     {
 
-        private System.Timers.Timer disconnectTimer = new System.Timers.Timer();
 
 
 
-        public void PingServer(DateTime dt, string name, string cn)
+        public void PingServer(DateTime dt, string name, string cn, string grupa)
         {
-            int brojac = 0;
-            List<string> korisnici = new List<string>();
+
+
+            List<string> grupe = new List<string>();
             try
             {
-                using (StreamReader sr = new StreamReader("..//..//..//Lista//JavljanjeKlijenata.txt"))
+                //Console.WriteLine("Ispis onog sto dobijem: " + grupa);
+                string samo = grupa.Split('=')[1];
+               // Console.WriteLine("Ispis nakon splitovanja po = : " + samo);
+                string[] gr = samo.Split('_');
+                for (int i = 0; i < gr.Count(); i++)
                 {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        korisnici.Add(line);
-                    }
+                    grupe.Add(gr[i]);
+                    Console.WriteLine("Nakon splitovanja po _ : " + gr[i] + "\n");
+                }
 
+            }
+            catch
+            {
+                grupe.Add(grupa);
+               // Console.WriteLine("Jedina grupa kojoj pripada: " + grupa);
+
+            }
+
+            bool postoji = false;
+            foreach (string g in grupe)
+            {
+                if (g == "RegionEast" || g == "RegionWest" || g == "RegionNorth" || g == "RegionSouth")
+                {
+                    postoji = true;
+                    break;
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("Nema kreiran txt");
 
-            }
 
-            foreach (string item in korisnici)
-            {
-                brojac++;
-            }
-
-            brojac++;
-            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//JavljanjeKlijenata.txt", true))
-            {
-                sw.WriteLine("<" + brojac + ">:<" + dt + ">:<" + cn + ">");
-            }
-            /*
-
-                        if (disconnectTimer.Enabled)
+            if (postoji)
+                {
+                    int brojac = 0;
+                    List<string> korisnici = new List<string>();
+                    try
+                    {
+                        using (StreamReader sr = new StreamReader("..//..//..//Lista//JavljanjeKlijenata.txt"))
                         {
-                            disconnectTimer.Stop();
+                            string line;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                korisnici.Add(line);
+                            }
 
-                            disconnectTimer.Start();
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Nema kreiran txt");
+
+                    }
+
+                    foreach (string item in korisnici)
+                    {
+                        brojac++;
+                    }
+
+                    brojac++;
+                    using (StreamWriter sw = new StreamWriter("..//..//..//Lista//JavljanjeKlijenata.txt", true))
+                    {
+                        sw.WriteLine("<" + brojac + ">:<" + DateTime.Now + ">:<" + cn + ">");
+                    }
 
 
-                        disconnectTimer.Interval = 10000;
-                        disconnectTimer.Enabled = true;
-                        disconnectTimer.AutoReset = false;*/
+                    Console.WriteLine("Klijent " + name + " se javio " + DateTime.Now + "\n");
 
-            Console.WriteLine("Klijent" + name + " se javio " + dt.ToString() + "\n");
+
+                }
+                else
+                {
+                    Console.WriteLine("Ne pripada grupi");
+                }
+
         }
 
 
