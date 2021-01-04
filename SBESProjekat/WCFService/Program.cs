@@ -90,7 +90,17 @@ namespace WCFService
                         case 4:
                             string myName1 = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);
-                            Console.WriteLine(proxy.AddToRevocationList(certificate1) ); 
+                            if (certificate1 == null)
+                            {
+                                Console.WriteLine("Sertifikat je vec povucen");
+                            }
+                            else
+                            {
+                                Console.WriteLine(proxy.AddToRevocationList(certificate1));
+                              //  string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                               // Writer.WriteMsg(msg);
+                            }
+                          //  Console.WriteLine(proxy.AddToRevocationList(certificate1) ); 
                             break;
                        
                     }
