@@ -15,6 +15,8 @@ namespace WCFService
     {
         static void Main(string[] args)
         {
+           
+
             string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);//naziv je dodjeljen po korisniku koji je pokrenuo proces,pozivamo fju ParseName kako bi dobili naziv serverkog sertifikata
 
             NetTcpBinding binding2 = new NetTcpBinding();
@@ -90,7 +92,7 @@ namespace WCFService
                             X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);
                             Console.WriteLine(proxy.AddToRevocationList(certificate1) ); 
                             break;
-
+                       
                     }
                 } while (option != 0);
 
