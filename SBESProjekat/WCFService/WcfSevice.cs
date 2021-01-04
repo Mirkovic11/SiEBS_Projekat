@@ -31,7 +31,7 @@ namespace WCFService
                 for (int i = 0; i < gr.Count(); i++)
                 {
                     grupe.Add(gr[i]);
-                    Console.WriteLine("Nakon splitovanja po _ : " + gr[i] + "\n");
+                    //Console.WriteLine("Nakon splitovanja po _ : " + gr[i] + "\n");
                 }
 
             }

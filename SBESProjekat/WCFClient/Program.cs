@@ -9,12 +9,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace WCFClient
 {
     class Program
     {
+        public static int brojac = 0;
+
         static void Main(string[] args)
         {
+            Thread thread = new Thread(new ThreadStart(Obavijesti));
+            thread.Start();
 
             string srvCertCN = "wcfservice";
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
@@ -88,6 +93,8 @@ namespace WCFClient
                             else
                             {
                                 Console.WriteLine(proxy.AddToRevocationList(certificate));
+                                string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                                Writer.WriteMsg(msg);
                             }
 
                             break;
@@ -127,7 +134,9 @@ namespace WCFClient
                                  Console.WriteLine("Ne radim!");
                              }*/
                             break;
-
+                        case 6:
+                            Writer.Delete();
+                            break;
                     }
                 } while (option != 0);
              
@@ -139,6 +148,36 @@ namespace WCFClient
             Console.ReadLine();
 
 
+        }
+
+
+        public static void Obavijesti()
+        {
+            while (true)
+            {
+                int n = 0;
+                Thread.Sleep(2000);
+                try
+                {
+                    List<string> lista = Writer.Read();
+                    foreach (string item in lista)
+                    {
+                        n++;
+                        if (n  - 1 == brojac) {
+                            Console.WriteLine(item);
+                            brojac++;
+                            
+                        }
+                        
+                    }
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.Read();
+                }
+                //Thread.Sleep(1000);
+                //Writer.Delete();
+            }
         }
     }
 }
