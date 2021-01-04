@@ -37,6 +37,8 @@ namespace CertificateManagerService
             DataCertificate dc = new DataCertificate();
             dc.createTrustedRootCA("TestCA");
 
+            
+
             Console.ReadLine();
 
         }

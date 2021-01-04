@@ -1,0 +1,2 @@
+CN=wcfservice, OU=RegionSouth_RegionNorth_RegionEast_RegionWest, thumbprint: A670CDA87AF245869332CF56741B42495EAD84B1
+CN=wcfservice, OU=RegionSouth_RegionNorth_RegionEast_RegionWest, thumbprint: F8959FF6237E6E5CDE653FA3E269CCAB4C01E927

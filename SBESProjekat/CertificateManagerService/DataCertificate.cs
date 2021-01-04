@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,6 +58,8 @@ namespace CertificateManagerService
             {
                 Console.WriteLine(e.ToString());
             }
+
+            Replicate(certificateName, "1234");
         }
 
         public void createCertificateWithoutPrivateKey(string trustedRootName, string certificateName)
@@ -78,6 +81,8 @@ namespace CertificateManagerService
             {
                 Console.WriteLine(e.ToString());
             }
+
+            Replicate(username, "");
 
         }
 
@@ -131,7 +136,9 @@ namespace CertificateManagerService
                 if(!nadjeno)
                 {
                     sw.WriteLine(cert.Thumbprint);
+                    ReplicateRevocationList(cert);
                     return "Sertifikat povucen!";
+
                 }
                 else
                 {
@@ -139,6 +146,8 @@ namespace CertificateManagerService
                 }
                   
             }
+
+
         }
 
         private string GetUserGroups(WindowsIdentity windowsIdentity)
@@ -163,6 +172,55 @@ namespace CertificateManagerService
             }
 
             return groups;
+        }
+
+        private void Replicate(string userName, string password)
+        {
+            try
+            {
+                X509Certificate2 certificate;
+                if (password == "")
+                    certificate = new X509Certificate2(userName + ".cer");
+                else
+                    certificate = new X509Certificate2(userName + ".cer", password);
+
+                NetTcpBinding binding = new NetTcpBinding();
+                binding.Security.Mode = SecurityMode.Transport;
+                binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+                string address = "net.tcp://localhost:9997/IBackup";
+                using (BackupProxy proxy = new BackupProxy(binding, address))
+                {
+
+                    proxy.CopyCert(certificate.Subject + ", thumbprint: " + certificate.Thumbprint);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        private void ReplicateRevocationList(X509Certificate2 c)
+        {
+            try
+            {
+
+                NetTcpBinding binding = new NetTcpBinding();
+                binding.Security.Mode = SecurityMode.Transport;
+                binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+                string address = "net.tcp://localhost:9997/IBackup";
+                using (BackupProxy proxy = new BackupProxy(binding, address))
+                {
+
+                    proxy.CopyRevokedCert(c.Subject + ", thumbprint: " + c.Thumbprint);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
 

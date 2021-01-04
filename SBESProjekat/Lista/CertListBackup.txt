@@ -1,0 +1,3 @@
+CN=wcfmanager, OU="", thumbprint: 7CC492CB78525B4BE45DE27C62C4BD88E6F9BA30
+CN=wcfservice, OU=RegionSouth_RegionNorth_RegionEast_RegionWest, thumbprint: 8E135EE573944F6DE438F9FE86E23D17E43DD10D
+CN=wcfservice, OU=RegionSouth_RegionNorth_RegionEast_RegionWest, thumbprint: F8959FF6237E6E5CDE653FA3E269CCAB4C01E927
