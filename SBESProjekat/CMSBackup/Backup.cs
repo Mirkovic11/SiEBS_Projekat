@@ -12,7 +12,7 @@ namespace CMSBackup
     {
         public void CopyCert(string cert)
         {
-            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//CertListBackup.txt", true))
+            using (StreamWriter sw = new StreamWriter("CertListBackup.txt", true))
             {
                 
                     sw.WriteLine(cert);
@@ -23,7 +23,7 @@ namespace CMSBackup
 
         public void CopyRevokedCert(string cert)
         {
-            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//RevocationListBackup.txt", true))
+            using (StreamWriter sw = new StreamWriter("RevocationListBackup.txt", true))
             {
 
                 sw.WriteLine(cert);
