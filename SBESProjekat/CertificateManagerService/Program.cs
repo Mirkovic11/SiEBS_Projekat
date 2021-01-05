@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,7 @@ namespace CertificateManagerService
        
         static void Main(string[] args)
         {
+            LogData.InitializeCMSEventLog();
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:9999/ICertificateManager";
 
@@ -32,6 +34,10 @@ namespace CertificateManagerService
             host.AddServiceEndpoint(typeof(ICertificateManager), binding, address);
 
             host.Open();
+            ServiceSecurityAuditBehavior audit = new ServiceSecurityAuditBehavior();
+            audit.AuditLogLocation = AuditLogLocation.Application;
+            host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            host.Description.Behaviors.Add(audit);
             Console.WriteLine("CertificateManagerService je pokrenut");
 
             DataCertificate dc = new DataCertificate();

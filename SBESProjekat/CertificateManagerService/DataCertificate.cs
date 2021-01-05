@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 
 namespace CertificateManagerService
 {
+    public enum IDType { GenerateSuccess = 0, RevokeSuccess, ReplicateSuccess, GenerateFailure, RevokeFailure, ReplicateFailure };
     public sealed class DataCertificate : ICertificateManager
     {
-     
-
+        private string message = string.Empty;
+        private EventLogEntryType evntType;
         public void createCertificateWithallKeys(string trustedRootName, string certificateName)
         {
             Process p = new Process();
@@ -36,7 +37,10 @@ namespace CertificateManagerService
             }
             catch(Exception e)
             {
-                e.ToString();
+                message = String.Format("Certificate cannot be generated to {0}.Error: {1}", username, e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateFailure));
+                return;
             }
             p.WaitForExit();
             p.Close();
@@ -56,8 +60,15 @@ namespace CertificateManagerService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                message = String.Format("Certificate with PVK cannot be generated to {0}.Error: {1}", username, e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateFailure));
+                return;
             }
+
+            message = String.Format("Certificate with PVK generated to {0}.", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name);
+            evntType = EventLogEntryType.SuccessAudit;
+            LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateSuccess));
 
             Replicate(certificateName, "1234");
         }
@@ -79,8 +90,15 @@ namespace CertificateManagerService
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.ToString());
+                message = String.Format("Certificate without PVK cannot be generated to {0}.Error: {1}", username, e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateFailure));
+                return;
             }
+
+            message = String.Format("Certificate without PVK generated to {0}.", username);
+            evntType = EventLogEntryType.SuccessAudit;
+            LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateSuccess));
 
             Replicate(username, "");
 
@@ -100,8 +118,15 @@ namespace CertificateManagerService
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.ToString());
+                message = String.Format("Root certificate {0} cannot be generated.Error: {1}", trustedRootName, e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateFailure));
+                return;
             }
+            message = String.Format("Root certificate {0} generated.", trustedRootName);
+            evntType = EventLogEntryType.SuccessAudit;
+            LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.GenerateSuccess));
+
 
         }
 
@@ -137,11 +162,19 @@ namespace CertificateManagerService
                 {
                     sw.WriteLine(cert.Thumbprint);
                     ReplicateRevocationList(cert);
+
+                    message = String.Format("Client {0}  with certificate[Subject {1}] has been revoked.Revocation list updated.", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
+                    evntType = EventLogEntryType.SuccessAudit;
+                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeSuccess));
+
                     return "Sertifikat povucen!";
 
                 }
                 else
                 {
+                    /*message = String.Format("Client {0}  with certificate[Subject {1}] has already been revoked", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
+                    evntType = EventLogEntryType.FailureAudit;
+                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeFailure));*/
                     return "Sertifikat je vec povucen.\n";
                 }
                   
@@ -191,13 +224,18 @@ namespace CertificateManagerService
                 string address = "net.tcp://localhost:9997/IBackup";
                 using (BackupProxy proxy = new BackupProxy(binding, address))
                 {
-
+                    message = String.Format("Client {0} with certificate[Subject {1}] successfully replicated.", userName, certificate.Subject);
+                    evntType = EventLogEntryType.SuccessAudit;
+                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.ReplicateSuccess));
                     proxy.CopyCert(certificate.Subject + ", thumbprint: " + certificate.Thumbprint);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                message = String.Format("Error with replicating client {0} certificate.Error: {1}", userName, e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.ReplicateFailure));
+                Console.WriteLine("Error while trying to replicate certificate {0}. ERROR = {1}", userName, e.Message);
             }
         }
 
@@ -213,13 +251,18 @@ namespace CertificateManagerService
                 string address = "net.tcp://localhost:9997/IBackup";
                 using (BackupProxy proxy = new BackupProxy(binding, address))
                 {
-
+                    message = String.Format("Revocation list successfully replicated.");
+                    evntType = EventLogEntryType.SuccessAudit;
+                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.ReplicateSuccess));
                     proxy.CopyRevokedCert(c.Subject + ", thumbprint: " + c.Thumbprint);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                message = String.Format("Error with replicating revocation list.Error: {0}", e.Message);
+                evntType = EventLogEntryType.FailureAudit;
+                LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.ReplicateFailure));
+                Console.WriteLine("Error while trying to replicate certificate {0}. ERROR = {1}", c.Subject, e.Message);
             }
         }
 

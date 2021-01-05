@@ -43,7 +43,7 @@ namespace WCFService
 
                 do
                 {
-                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 izlaz");
+                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 izlaz, 4 za povlacenje sertifikata");
                     int.TryParse(Console.ReadLine(), out option);
 
                     switch (option)
@@ -92,7 +92,7 @@ namespace WCFService
                             X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);
                             if (certificate1 == null)
                             {
-                                Console.WriteLine("Sertifikat je vec povucen");
+                                Console.WriteLine("Sertifikat je vec povucen - mrs!");
                             }
                             else
                             {
