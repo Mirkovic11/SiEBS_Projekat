@@ -1,12 +1,15 @@
 ﻿using Contracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WCFService
@@ -15,7 +18,10 @@ namespace WCFService
     {
         static void Main(string[] args)
         {
-           
+
+            LogData.InitializeServerEventLog();
+            Thread thread = new Thread(new ThreadStart(ClosingClientConnection));//xD
+            thread.Start();
 
             string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);//naziv je dodjeljen po korisniku koji je pokrenuo proces,pozivamo fju ParseName kako bi dobili naziv serverkog sertifikata
 
@@ -82,6 +88,11 @@ namespace WCFService
 
                                 host.Open();
 
+                                ServiceSecurityAuditBehavior audit = new ServiceSecurityAuditBehavior();
+                                audit.AuditLogLocation = AuditLogLocation.Application;
+                                host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+                                host.Description.Behaviors.Add(audit);
+
                                 Console.WriteLine("Server podignut");
                             }
 
@@ -109,6 +120,31 @@ namespace WCFService
             }
 
             Console.ReadLine();
+
+        }
+        public static void ClosingClientConnection()
+        {
+
+            while (true)
+            {
+                using (StreamReader sr = new StreamReader("..//..//..//Lista//Diskonektovani.txt"))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string message = String.Format("Client {0} closed connection with server.", line);
+                        EventLogEntryType evntType = EventLogEntryType.SuccessAudit;
+
+                        LogData.WriteEntryServer(message, evntType, Convert.ToInt32(IDType.Disconnected));
+                    }
+                    
+                }
+                using (FileStream fs = File.Create("..//..//..//Lista//Diskonektovani.txt"))
+                {
+
+                }
+                Thread.Sleep(2000);
+            }
 
         }
     }

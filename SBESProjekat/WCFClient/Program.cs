@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -18,7 +19,7 @@ namespace WCFClient
 
         static void Main(string[] args)
         {
-            Thread thread = new Thread(new ThreadStart(Obavijesti));
+            Thread thread = new Thread(new ThreadStart(Obavijesti));//xD
             thread.Start();
 
             string srvCertCN = "wcfservice";
@@ -49,7 +50,7 @@ namespace WCFClient
             {
                 int option = 0;
                 string certName = "";
-
+                ClientProxyService proxy2 = null;
                 //proxy.createTrustedRootCA("TestCAClient");
 
                 do
@@ -70,7 +71,7 @@ namespace WCFClient
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
-                            ClientProxyService proxy2 = new ClientProxyService(binding2, address2);
+                             proxy2 = new ClientProxyService(binding2, address2);
                             try
                             {
 
@@ -82,6 +83,8 @@ namespace WCFClient
                             {
 
                             }
+                            CloseProxy(proxy2);
+
                             break;
                         case 4:
                             string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
@@ -99,40 +102,45 @@ namespace WCFClient
 
                             break;
                         case 5:
-                            //  try { 
-                            ClientProxyService proxy3 = new ClientProxyService(binding2, address2);
+                            ////  try { 
+                            //ClientProxyService proxy3 = new ClientProxyService(binding2, address2);
 
-                            Console.WriteLine("Starting to ping server...");
-                            string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                             
+                                proxy2 = new ClientProxyService(binding2, address2);
+                            
+                                Console.WriteLine("Starting to ping server...");
+                                string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
 
-                            X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
-                            if (cert == null)
-                            {
-                                Console.WriteLine("Nema sertifikata");
-                            }
-                            string CN = cert.SubjectName.Name.Split(',')[0];
-                            string grupa = cert.SubjectName.Name.Split(',')[1];
-                            Console.WriteLine(CN);
-                            Random r = new Random();
-                            try
-                            {
-                                while (true)
+
+                                X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
+                                if (cert == null)
                                 {
-                                    Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
-
-                                    proxy3.PingServer(DateTime.Now, name, CN, grupa);
+                                    Console.WriteLine("Nema sertifikata");
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine("evo me");
-                                Console.WriteLine(ex.Message);
-                            }
-                            /* }catch
-                             {
-                                 Console.WriteLine("Ne radim!");
-                             }*/
+                                string CN = cert.SubjectName.Name.Split(',')[0];
+                                string grupa = cert.SubjectName.Name.Split(',')[1];
+                                Console.WriteLine(CN);
+                                Random r = new Random();
+                                try
+                                {
+                                    int brojac = 0;
+                                    while (brojac < 10)
+                                    {
+                                        brojac++;
+                                        Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
+
+                                        proxy2.PingServer(DateTime.Now, name, CN, grupa);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("evo me");
+                                    Console.WriteLine(ex.Message);
+                                }
+
+
+                            CloseProxy(proxy2);
+
                             break;
                         case 6:
                             Writer.Delete();
@@ -179,5 +187,16 @@ namespace WCFClient
                 //Writer.Delete();
             }
         }
+
+        public static void CloseProxy(ClientProxyService proxy)
+        {
+            proxy.Close();
+            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//Diskonektovani.txt", true))
+            {
+                string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                sw.WriteLine(name);
+            }
+            }
+
     }
 }
