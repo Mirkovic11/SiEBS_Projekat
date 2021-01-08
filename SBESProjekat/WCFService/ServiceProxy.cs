@@ -22,8 +22,7 @@ namespace WCFService
         {
 
             factory = this.CreateChannel();
-            //zabraniti izvrsavanje autentifikacije putem NTLM protokola
-            //Credentials.Windows.AllowNtlm = false;
+            
         }
 
         public string AddToRevocationList(X509Certificate2 cert)

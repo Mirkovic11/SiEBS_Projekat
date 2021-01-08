@@ -50,19 +50,13 @@ namespace WCFClient
             }
 
 
-
-
-
-            //zabraniti izvrsavanje autentifikacije putem NTLM protokola
-            //Credentials.Windows.AllowNtlm = false;
-
         }
 
-        public void PingServer(DateTime dt, string name, string cn, string grupa)
+        public void PingServer(DateTime dt)
         {
             try
             {
-                factory.PingServer(dt, name, cn, grupa);
+                factory.PingServer(dt);
 
             }catch(Exception e)
             {

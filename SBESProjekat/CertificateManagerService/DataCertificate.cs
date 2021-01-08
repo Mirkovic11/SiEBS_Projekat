@@ -28,7 +28,7 @@ namespace CertificateManagerService
             //string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username+ "\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
             string commmand ="-sv "+certificateName+".pvk -iv "+trustedRootName+".pvk -n \"CN = "+username + ",OU=" + groups + "\" -pe -ic " + trustedRootName+".cer "+certificateName+".cer -sr localmachine -ss My -sky exchange";
             
-            Console.WriteLine(commmand);
+            //Console.WriteLine(commmand);
             ProcessStartInfo startInfo = new ProcessStartInfo(makecertPath, commmand);
             p.StartInfo = startInfo;
             try

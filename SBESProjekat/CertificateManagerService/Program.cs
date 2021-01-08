@@ -27,7 +27,7 @@ namespace CertificateManagerService
             binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
-            Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
+            Console.WriteLine("Korisnik koji je pokrenuo CMS: " + WindowsIdentity.GetCurrent().Name);
 
 
             ServiceHost host = new ServiceHost(typeof(DataCertificate));

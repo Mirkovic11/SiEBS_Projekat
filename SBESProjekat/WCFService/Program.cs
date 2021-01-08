@@ -19,6 +19,8 @@ namespace WCFService
         static void Main(string[] args)
         {
 
+            Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
+
             LogData.InitializeServerEventLog();
             Thread thread = new Thread(new ThreadStart(ClosingClientConnection));//xD
             thread.Start();
@@ -38,18 +40,29 @@ namespace WCFService
             binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
+            
 
+            bool otvoreno = false;
             using (ServiceProxy proxy = new ServiceProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {
-
+                
                 int option = 0;
                 string certName = "";
 
-                //proxy.createTrustedRootCA("TestCAService");
-
                 do
                 {
-                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 izlaz, 4 za povlacenje sertifikata");
+                    Console.WriteLine("--------------------------------------------------------------");
+                    Console.WriteLine("Izaberite opciju:");
+                    Console.WriteLine("1 za kreiranje sertifikata sa svim kljucevima");
+                    Console.WriteLine("2 za kreiranje sertifikata bez privatnog kljuca");
+                    Console.WriteLine("3 za podizanje servera");
+                    Console.WriteLine("4 za povlacenje sertifikata");
+                    Console.WriteLine("0 izlaz");
+                    Console.WriteLine("--------------------------------------------------------------");
+
+
+                    ServiceHost host = new ServiceHost(typeof(WcfSevice));
+
                     int.TryParse(Console.ReadLine(), out option);
 
                     switch (option)
@@ -65,9 +78,9 @@ namespace WCFService
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
-                            ServiceHost host = new ServiceHost(typeof(WcfSevice));
-                            host.AddServiceEndpoint(typeof(IWcfService), binding2, address2);
 
+                            
+                            host.AddServiceEndpoint(typeof(IWcfService), binding2, address2);
 
                             string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
@@ -83,10 +96,26 @@ namespace WCFService
                             else
                             {
                                 host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
-
                                 host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
 
-                                host.Open();
+                                /*if (otvoreno)
+                                {
+                                    Console.WriteLine("NIJE BOOL FALSE");
+                                }*/
+
+                                try
+                                {
+                                    
+                                    otvoreno = true;
+                                    host.Open();
+
+                                } catch
+                                {
+                                    Console.WriteLine("Server vec podignut");
+                                }
+                                
+
+                               
 
                                 ServiceSecurityAuditBehavior audit = new ServiceSecurityAuditBehavior();
                                 audit.AuditLogLocation = AuditLogLocation.Application;
@@ -108,10 +137,19 @@ namespace WCFService
                             else
                             {
                                 Console.WriteLine(proxy.AddToRevocationList(certificate1));
-                              //  string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-                               // Writer.WriteMsg(msg);
+                                /*if (otvoreno)
+                                {
+                                    Console.WriteLine("OVDE SAM GDE TREBA DA GASIM I TRUE SAM");
+                                    otvoreno = false;
+                                    host.Close();
+                                    
+                                    if (!otvoreno)
+                                    {
+                                        Console.WriteLine("PROMENIO SAM NA FALSE");
+                                    }
+                                }*/
+                                
                             }
-                          //  Console.WriteLine(proxy.AddToRevocationList(certificate1) ); 
                             break;
                        
                     }

@@ -22,50 +22,39 @@ namespace WCFService
         private EventLogEntryType evntType;
         public WcfSevice()
         {
-            Console.WriteLine("jedan");
             string message = String.Format("Client {0} established connection with server.", ServiceSecurityContext.Current.PrimaryIdentity.Name);
             EventLogEntryType evntType = EventLogEntryType.SuccessAudit;
-            Console.WriteLine("DVA");
             LogData.WriteEntryServer(message, evntType, Convert.ToInt32(IDType.Connected));
-            Console.WriteLine("aaa");
         }
 
-        //public void Connected(string username)
-        //{
-        //    string poruka = "Client " + username + " connected to WCFService";
-        //    evntType = EventLogEntryType.SuccessAudit;
-        //    LogData.WriteEntryServer(poruka, evntType, Convert.ToInt32(IDType.Connected));
-        //}
-
-        //public void Disconnected(string username)
-        //{
-        //    string poruka = "Client " + username + " disconnected to WCFService";
-        //    evntType = EventLogEntryType.SuccessAudit;
-        //    LogData.WriteEntryServer(poruka, evntType, Convert.ToInt32(IDType.Disconnected));
-        //}
-
-        public void PingServer(DateTime dt, string name, string cn, string grupa)
+        public void PingServer(DateTime dt)
         {
+            X509Certificate2 cC = getClientCertificate();
+
+            string CN = cC.SubjectName.Name.Split(',')[0];
+            string grupa = cC.SubjectName.Name.Split(',')[1];
+            string name = CN.Split('=')[1];
+
 
 
             List<string> grupe = new List<string>();
             try
             {
-                //Console.WriteLine("Ispis onog sto dobijem: " + grupa);
+
                 string samo = grupa.Split('=')[1];
-               // Console.WriteLine("Ispis nakon splitovanja po = : " + samo);
+
                 string[] gr = samo.Split('_');
                 for (int i = 0; i < gr.Count(); i++)
                 {
                     grupe.Add(gr[i]);
-                    //Console.WriteLine("Nakon splitovanja po _ : " + gr[i] + "\n");
+
                 }
 
             }
             catch
             {
                 grupe.Add(grupa);
-               // Console.WriteLine("Jedina grupa kojoj pripada: " + grupa);
+
 
             }
 
@@ -110,7 +99,7 @@ namespace WCFService
                     brojac++;
                     using (StreamWriter sw = new StreamWriter("..//..//..//Lista//JavljanjeKlijenata.txt", true))
                     {
-                        sw.WriteLine("<" + brojac + ">:<" + DateTime.Now + ">:<" + cn + ">");
+                        sw.WriteLine("<" + brojac + ">:<" + DateTime.Now + ">:<" + CN + ">");
                     }
 
 

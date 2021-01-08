@@ -51,11 +51,20 @@ namespace WCFClient
                 int option = 0;
                 string certName = "";
                 ClientProxyService proxy2 = null;
-                //proxy.createTrustedRootCA("TestCAClient");
 
                 do
                 {
-                    Console.WriteLine("Unesi 1 za kreiranje sertifikata sa svim kljucevima, 2 za kreiranje sertifikata bez privatnog kljuca, 3 konekcija sa serverom, 4 povlacenje sertifikata, 5 za javljanje serveru,0 za izlaz");
+                    Console.WriteLine("----------------------------------------------------------");
+                    Console.WriteLine("Izaberite opciju:");
+                    Console.WriteLine("1 za kreiranje sertifikata sa svim kljucevima");
+                    Console.WriteLine("2 za kreiranje sertifikata bez privatnog kljuca");
+                    Console.WriteLine("3 za konekciju sa serverom");
+                    Console.WriteLine("4 za povlacenje sertifikata");
+                    Console.WriteLine("5 za javljanje serveru");
+                    Console.WriteLine("0 izlaz");
+                    Console.WriteLine("----------------------------------------------------------");
+
+
                     int.TryParse(Console.ReadLine(), out option);
 
                     switch (option)
@@ -74,14 +83,11 @@ namespace WCFClient
                              proxy2 = new ClientProxyService(binding2, address2);
                             try
                             {
-
-
                                 Console.WriteLine(proxy2.TestCommunication());
-
                             }
                             catch
                             {
-
+                                Console.WriteLine("Greska pri konekciji");
                             }
                             CloseProxy(proxy2);
 
@@ -102,9 +108,7 @@ namespace WCFClient
 
                             break;
                         case 5:
-                            ////  try { 
-                            //ClientProxyService proxy3 = new ClientProxyService(binding2, address2);
-
+                           
                             
                                 proxy2 = new ClientProxyService(binding2, address2);
                             
@@ -117,9 +121,7 @@ namespace WCFClient
                                 {
                                     Console.WriteLine("Nema sertifikata");
                                 }
-                                string CN = cert.SubjectName.Name.Split(',')[0];
-                                string grupa = cert.SubjectName.Name.Split(',')[1];
-                                Console.WriteLine(CN);
+                                
                                 Random r = new Random();
                                 try
                                 {
@@ -129,22 +131,19 @@ namespace WCFClient
                                         brojac++;
                                         Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
 
-                                        proxy2.PingServer(DateTime.Now, name, CN, grupa);
+                                        proxy2.PingServer(DateTime.Now);
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine("evo me");
-                                    Console.WriteLine(ex.Message);
+                                    Console.WriteLine("Greska pri konekciji");
                                 }
 
 
                             CloseProxy(proxy2);
 
                             break;
-                        case 6:
-                            Writer.Delete();
-                            break;
+                     
                     }
                 } while (option != 0);
              
@@ -183,8 +182,7 @@ namespace WCFClient
                     Console.WriteLine(e.ToString());
                     Console.Read();
                 }
-                //Thread.Sleep(1000);
-                //Writer.Delete();
+                
             }
         }
 
@@ -196,7 +194,7 @@ namespace WCFClient
                 string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                 sw.WriteLine(name);
             }
-            }
+        }
 
     }
 }
