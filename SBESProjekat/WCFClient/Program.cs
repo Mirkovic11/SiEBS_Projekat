@@ -80,16 +80,18 @@ namespace WCFClient
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
-                             proxy2 = new ClientProxyService(binding2, address2);
+                             
                             try
                             {
+                                proxy2 = new ClientProxyService(binding2, address2);
                                 Console.WriteLine(proxy2.TestCommunication());
+                                CloseProxy(proxy2);
                             }
                             catch
                             {
                                 Console.WriteLine("Greska pri konekciji");
                             }
-                            CloseProxy(proxy2);
+                            
 
                             break;
                         case 4:
@@ -101,7 +103,7 @@ namespace WCFClient
                             }
                             else
                             {
-                                Thread.Sleep(300);
+                                Thread.Sleep(1000);
                                 Console.WriteLine(proxy.AddToRevocationList(certificate));
                                 string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                                 Writer.WriteMsg(msg);
@@ -113,16 +115,18 @@ namespace WCFClient
                             
                                 proxy2 = new ClientProxyService(binding2, address2);
                             
-                                Console.WriteLine("Starting to ping server...");
+                               
                                 string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
 
 
                                 X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
                                 if (cert == null)
                                 {
-                                    Console.WriteLine("Nema sertifikata");
+                                    //Console.WriteLine("Nema sertifikata");
+                                    break;
                                 }
-                                
+
+                                Console.WriteLine("Starting to ping server...");
                                 Random r = new Random();
                                 try
                                 {
@@ -131,11 +135,12 @@ namespace WCFClient
                                     {
                                         brojac++;
                                         Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
-
+                                    
                                         proxy2.PingServer(DateTime.Now);
+                                    
                                     }
                                 }
-                                catch (Exception ex)
+                                catch 
                                 {
                                     Console.WriteLine("Greska pri konekciji");
                                 }
