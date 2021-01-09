@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Cont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMSBackup", "CMSBackup\CMSBackup.csproj", "{12CE8CF0-D048-405F-9982-0462B5C01480}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cleaner", "Cleaner\Cleaner.csproj", "{5F59F8F5-57DD-43A8-B612-2EC62768DC74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{12CE8CF0-D048-405F-9982-0462B5C01480}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12CE8CF0-D048-405F-9982-0462B5C01480}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12CE8CF0-D048-405F-9982-0462B5C01480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F59F8F5-57DD-43A8-B612-2EC62768DC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F59F8F5-57DD-43A8-B612-2EC62768DC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F59F8F5-57DD-43A8-B612-2EC62768DC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F59F8F5-57DD-43A8-B612-2EC62768DC74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

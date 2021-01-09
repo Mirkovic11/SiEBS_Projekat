@@ -101,6 +101,7 @@ namespace WCFClient
                             }
                             else
                             {
+                                Thread.Sleep(300);
                                 Console.WriteLine(proxy.AddToRevocationList(certificate));
                                 string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                                 Writer.WriteMsg(msg);

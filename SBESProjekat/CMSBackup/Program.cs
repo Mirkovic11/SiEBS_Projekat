@@ -16,10 +16,7 @@ namespace CMSBackup
     {
         static void Main(string[] args)
         {
-            FileStream fs = File.Create("..//..//..//Lista//CertListBackup.txt");
-            //Thread.Sleep(2000);
-            fs = File.Create("..//..//..//Lista//RevocationListBackup.txt");
-            //Thread.Sleep(2000);
+           
 
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:9997/IBackup";
