@@ -8,6 +8,9 @@ namespace Contracts
 {
     public class Formatter
     {
+        public static readonly object dummy = new object();
+
+       
         public static string ParseName(string winLogonName)//korisitmo dabi dobili username (npr. wcfclient...), to nam treba za sertifikate
         {
             string[] parts = new string[] { };

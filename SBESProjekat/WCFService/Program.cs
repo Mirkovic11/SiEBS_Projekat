@@ -19,6 +19,8 @@ namespace WCFService
         static void Main(string[] args)
         {
 
+            
+
             Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
 
             LogData.InitializeServerEventLog();
@@ -97,22 +99,10 @@ namespace WCFService
                             {
                                 host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
                                 host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
+                                host.Open();
 
-                                /*if (otvoreno)
-                                {
-                                    Console.WriteLine("NIJE BOOL FALSE");
-                                }*/
 
-                                try
-                                {
-                                    
-                                    otvoreno = true;
-                                    host.Open();
-
-                                } catch
-                                {
-                                    Console.WriteLine("Server vec podignut");
-                                }
+                                
                                 
 
                                
@@ -132,23 +122,12 @@ namespace WCFService
                             X509Certificate2 certificate1 = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName1);
                             if (certificate1 == null)
                             {
-                                Console.WriteLine("Sertifikat je vec povucen - mrs!");
+                                Console.WriteLine("Sertifikat je vec povucen");
                             }
                             else
                             {
                                 Console.WriteLine(proxy.AddToRevocationList(certificate1));
-                                /*if (otvoreno)
-                                {
-                                    Console.WriteLine("OVDE SAM GDE TREBA DA GASIM I TRUE SAM");
-                                    otvoreno = false;
-                                    host.Close();
-                                    
-                                    if (!otvoreno)
-                                    {
-                                        Console.WriteLine("PROMENIO SAM NA FALSE");
-                                    }
-                                }*/
-                                
+                               
                             }
                             break;
                        
@@ -185,5 +164,7 @@ namespace WCFService
             }
 
         }
+
+        
     }
 }

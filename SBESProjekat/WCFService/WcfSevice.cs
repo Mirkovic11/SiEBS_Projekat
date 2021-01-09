@@ -109,7 +109,7 @@ namespace WCFService
                 }
                 else
                 {
-                    Console.WriteLine("Ne pripada grupi");
+                    Console.WriteLine("Klijent "+name+" nije autorizovan za zeljenu akciju jer ne pripada grupama kojima je to omoguceno!");
                 }
 
         }

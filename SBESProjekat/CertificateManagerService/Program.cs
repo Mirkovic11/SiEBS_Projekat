@@ -16,9 +16,12 @@ namespace CertificateManagerService
 {
     class Program
     {
-       
+
         static void Main(string[] args)
         {
+
+            
+
             LogData.InitializeCMSEventLog();
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:9999/ICertificateManager";
@@ -43,10 +46,15 @@ namespace CertificateManagerService
             DataCertificate dc = new DataCertificate();
             dc.createTrustedRootCA("TestCA");
 
-            
+
 
             Console.ReadLine();
 
         }
+
+       
+
+
+       
     }
 }

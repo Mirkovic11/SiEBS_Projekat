@@ -171,7 +171,7 @@ namespace WCFClient
                     {
                         n++;
                         if (n  - 1 == brojac) {
-                            Console.WriteLine(item);
+                            Console.WriteLine("Klijent "+item.Split(' ')[1]+" je povukao sertifikat");
                             brojac++;
                             
                         }
