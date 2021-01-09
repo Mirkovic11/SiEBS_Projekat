@@ -23,32 +23,32 @@ namespace WCFClient
 
         public ClientProxyService(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
-
-            string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
-
-
-            List<string> Lista = new List<string>();
-            bool nadjeno = false;
-            string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-
-            X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
-
-            if (certificate == null)
-            {
-                Console.WriteLine("nemate sertifikat");
-            }
-            else
-            {
-                Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
-
-                this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+            
+                string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
 
-                this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+                List<string> Lista = new List<string>();
+                bool nadjeno = false;
+                string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
 
-                factory = this.CreateChannel();
-            }
+                X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
 
+                if (certificate == null)
+                {
+                    Console.WriteLine("nemate sertifikat");
+                }
+                else
+                {
+                    Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+
+                    this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+
+                    this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+
+                    factory = this.CreateChannel();
+                }
+            
 
         }
 

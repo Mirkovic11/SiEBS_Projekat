@@ -29,47 +29,57 @@ namespace WCFService
 
         public void PingServer(DateTime dt)
         {
-            X509Certificate2 cC = getClientCertificate();
+            
 
-            string CN = cC.SubjectName.Name.Split(',')[0];
-            string grupa = cC.SubjectName.Name.Split(',')[1];
-            string name = CN.Split('=')[1];
+                bool postoji = false;
 
 
-
-            List<string> grupe = new List<string>();
-            try
+                X509Certificate2 cC = getClientCertificate();
+            if(cC == null)
             {
+                Console.WriteLine("Sertifikat ne postoji");
+                return;
+            }
 
-                string samo = grupa.Split('=')[1];
+                string CN = cC.SubjectName.Name.Split(',')[0];
+                string grupa = cC.SubjectName.Name.Split(',')[1];
+                string name = CN.Split('=')[1];
 
-                string[] gr = samo.Split('_');
-                for (int i = 0; i < gr.Count(); i++)
+
+
+                List<string> grupe = new List<string>();
+                try
                 {
-                    grupe.Add(gr[i]);
+
+                    string samo = grupa.Split('=')[1];
+
+                    string[] gr = samo.Split('_');
+                    for (int i = 0; i < gr.Count(); i++)
+                    {
+                        grupe.Add(gr[i]);
+
+                    }
+
+                }
+                catch
+                {
+                    grupe.Add(grupa);
+
 
                 }
 
-            }
-            catch
-            {
-                grupe.Add(grupa);
 
-
-            }
-
-            bool postoji = false;
-            foreach (string g in grupe)
-            {
-                if (g == "RegionEast" || g == "RegionWest" || g == "RegionNorth" || g == "RegionSouth")
+                foreach (string g in grupe)
                 {
-                    postoji = true;
-                    break;
+                    if (g == "RegionEast" || g == "RegionWest" || g == "RegionNorth" || g == "RegionSouth")
+                    {
+                        postoji = true;
+                        break;
+                    }
                 }
-            }
 
 
-            if (postoji)
+                if (postoji)
                 {
                     int brojac = 0;
                     List<string> korisnici = new List<string>();
@@ -109,9 +119,9 @@ namespace WCFService
                 }
                 else
                 {
-                    Console.WriteLine("Klijent "+name+" nije autorizovan za zeljenu akciju jer ne pripada grupama kojima je to omoguceno!");
+                    Console.WriteLine("Klijent " + name + " nije autorizovan za zeljenu akciju jer ne pripada grupama kojima je to omoguceno!");
                 }
-
+            
         }
 
 
@@ -128,8 +138,15 @@ namespace WCFService
 
         private X509Certificate2 getClientCertificate()
         {
-            return ((X509CertificateClaimSet)
-                    OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets[0]).X509Certificate;
+            try
+            {
+                return ((X509CertificateClaimSet)
+                        OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets[0]).X509Certificate;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
