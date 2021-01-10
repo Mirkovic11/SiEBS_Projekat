@@ -19,8 +19,8 @@ namespace WCFClient
 
         static void Main(string[] args)
         {
-            Thread thread = new Thread(new ThreadStart(Obavijesti));//xD
-            thread.Start();
+           /* Thread thread = new Thread(new ThreadStart(Obavijesti));//xD
+            thread.Start();*/
 
             string srvCertCN = "wcfservice";
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
@@ -103,7 +103,7 @@ namespace WCFClient
                             }
                             else
                             {
-                                Thread.Sleep(1000);
+                               // Thread.Sleep(1000);
                                 Console.WriteLine(proxy.AddToRevocationList(certificate));
                                 string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                                 Writer.WriteMsg(msg);
@@ -169,18 +169,28 @@ namespace WCFClient
             while (true)
             {
                 int n = 0;
-                Thread.Sleep(2000);
+               // Thread.Sleep(2000);
                 try
                 {
-                    List<string> lista = Writer.Read();
+                    List<string> lista = Reader.Read();
                     foreach (string item in lista)
                     {
                         n++;
-                        if (n  - 1 == brojac) {
-                            Console.WriteLine("Klijent "+item.Split(' ')[1]+" je povukao sertifikat");
-                            brojac++;
-                            
+                        try
+                        {
+                            if (n - 1 == brojac)
+                            {
+
+                                Console.WriteLine("Klijent " + item.Split(' ')[1] + " je povukao sertifikat");
+                                brojac++;
+
+                            }
                         }
+                        catch
+                        {
+
+                        }
+                       
                         
                     }
                 }catch(Exception e)

@@ -129,58 +129,64 @@ namespace CertificateManagerService
 
 
         }
-
+       // private static readonly Object obj = new Object();
         public string AddToRevocationList(X509Certificate2 cert)
         {
+           // var temp = obj;
+           // System.Threading.Monitor.Enter(temp);
+
             List<string> Lista = new List<string>();
             bool nadjeno = false;
             //if(!File.Exists("RevocationList.txt"))
-          //  {
-             //   File.Create("RevocationList.txt");
-           // }
-            using (StreamReader sr = new StreamReader("..//..//..//Lista//RevocationList.txt"))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
+            //  {
+            //   File.Create("RevocationList.txt");
+            // }
+            // try
+            // {
+            var stream = File.Open("..//..//..//Lista//RevocationList.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+            using (var sr = new StreamReader(stream))
                 {
-                    Lista.Add(line);
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        Lista.Add(line);
+                    }
                 }
-            }
-            
-            foreach (string item in Lista)
-            {
-                if (item == cert.Thumbprint)
+
+                foreach (string item in Lista)
                 {
-                    nadjeno = true;
-                    break;
+                    if (item == cert.Thumbprint)
+                    {
+                        nadjeno = true;
+                        break;
+                    }
                 }
-            }
-            using (StreamWriter sw = new StreamWriter("..//..//..//Lista//RevocationList.txt", true))
-            {
-                
-                if(!nadjeno)
+            var stream1 = File.Open("..//..//..//Lista//RevocationList.txt", FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            using (var sw = new StreamWriter(stream1))
                 {
-                    sw.WriteLine(cert.Thumbprint);
-                    ReplicateRevocationList(cert);
 
-                    message = String.Format("Client {0}  with certificate[Subject {1}] has been revoked.Revocation list updated.", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
-                    evntType = EventLogEntryType.SuccessAudit;
-                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeSuccess));
+                    if (!nadjeno)
+                    {
+                        sw.WriteLine(cert.Thumbprint);
+                        ReplicateRevocationList(cert);
 
-                    return "Sertifikat povucen!";
+                        message = String.Format("Client {0}  with certificate[Subject {1}] has been revoked.Revocation list updated.", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
+                        evntType = EventLogEntryType.SuccessAudit;
+                        LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeSuccess));
+
+                        return "Sertifikat povucen!";
+
+                    }
+                    else
+                    {
+                        /*message = String.Format("Client {0}  with certificate[Subject {1}] has already been revoked", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
+                        evntType = EventLogEntryType.FailureAudit;
+                        LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeFailure));*/
+                        return "Sertifikat je vec povucen.\n";
+                    }
 
                 }
-                else
-                {
-                    /*message = String.Format("Client {0}  with certificate[Subject {1}] has already been revoked", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
-                    evntType = EventLogEntryType.FailureAudit;
-                    LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeFailure));*/
-                    return "Sertifikat je vec povucen.\n";
-                }
-                  
-            }
-
-
         }
 
         private string GetUserGroups(WindowsIdentity windowsIdentity)
