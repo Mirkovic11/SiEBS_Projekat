@@ -180,9 +180,9 @@ namespace CertificateManagerService
                     }
                     else
                     {
-                        /*message = String.Format("Client {0}  with certificate[Subject {1}] has already been revoked", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
+                        message = String.Format("Client {0}  with certificate[Subject {1}] has already been revoked", (Thread.CurrentPrincipal.Identity as WindowsIdentity).Name, cert.Subject);
                         evntType = EventLogEntryType.FailureAudit;
-                        LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeFailure));*/
+                        LogData.WriteEntryCMS(message, evntType, Convert.ToInt32(IDType.RevokeFailure));
                         return "Sertifikat je vec povucen.\n";
                     }
 
