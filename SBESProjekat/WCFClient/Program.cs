@@ -19,12 +19,35 @@ namespace WCFClient
 
         static void Main(string[] args)
         {
-            Thread thread = new Thread(new ThreadStart(Obavijesti));//xD
-            thread.Start();
+            bool serverPovukaoSert3 = false;
+            bool serverPovukaoSert5 = false;
+
+             Thread thread = new Thread(new ThreadStart(Obavijesti));//xD
+             thread.Start();
+
+            Console.WriteLine("Korisnik koji je pokrenuo klijenta: " + WindowsIdentity.GetCurrent().Name);
 
             string srvCertCN = "wcfservice";
-            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
+            X509Certificate2 srvCert = null;
+            bool a = false;
+            while (true)
+            {
+                srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
+                if (srvCert == null)
+                {
+                    if (a == false)
+                    {
+                        Console.WriteLine("Morate sacekati dok server ne instalira sertifikat.");
+                        a = true;
+                    }
 
+                }
+                else
+                {
+                    break;
+                }
+                Thread.Sleep(1000);
+            }
             NetTcpBinding binding2 = new NetTcpBinding();
 
            
@@ -41,10 +64,6 @@ namespace WCFClient
             binding2.Security.Mode = SecurityMode.Transport;
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
-            
-
-            Console.WriteLine("Korisnik koji je pokrenuo klijenta: " + WindowsIdentity.GetCurrent().Name);
-
            
             using (ClientProxy proxy = new ClientProxy(binding, address)) //da radim ono za NTLM ovde bih prosledio endpointAddress
             {
@@ -54,16 +73,15 @@ namespace WCFClient
 
                 do
                 {
-                    Console.WriteLine("----------------------------------------------------------");
-                    Console.WriteLine("Izaberite opciju:");
-                    Console.WriteLine("1 za kreiranje sertifikata sa svim kljucevima");
-                    Console.WriteLine("2 za kreiranje sertifikata bez privatnog kljuca");
-                    Console.WriteLine("3 za konekciju sa serverom");
-                    Console.WriteLine("4 za povlacenje sertifikata");
-                    Console.WriteLine("5 za javljanje serveru");
-                    Console.WriteLine("0 izlaz");
-                    Console.WriteLine("----------------------------------------------------------");
-
+                    Console.WriteLine("----------------------------------------------------------\n" +
+                        "Izaberite opciju:\n" +
+                        "1 za kreiranje sertifikata sa svim kljucevima\n" +
+                        "2 za kreiranje sertifikata bez privatnog kljuca\n" +
+                        "3 za konekciju sa serverom\n" +
+                        "4 za povlacenje sertifikata\n" +
+                        "5 za javljanje serveru\n" +
+                        "0 izlaz\n" +
+                        "----------------------------------------------------------");
 
                     int.TryParse(Console.ReadLine(), out option);
 
@@ -83,13 +101,27 @@ namespace WCFClient
                              
                             try
                             {
-                                proxy2 = new ClientProxyService(binding2, address2);
-                                Console.WriteLine(proxy2.TestCommunication());
-                                CloseProxy(proxy2);
+                                if (serverPovukaoSert3)
+                                {
+                                    srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
+                                    EndpointAddress address2nova = new EndpointAddress(new Uri("net.tcp://localhost:9998/IWcfService"),
+                                  new X509CertificateEndpointIdentity(srvCert));
+
+                                    proxy2 = new ClientProxyService(binding2, address2nova);
+                                    Console.WriteLine(proxy2.TestCommunication());
+                                    CloseProxy(proxy2);
+                                }
+                               else
+                                {
+                                    proxy2 = new ClientProxyService(binding2, address2);
+                                    Console.WriteLine(proxy2.TestCommunication());
+                                    CloseProxy(proxy2);
+                                }
                             }
                             catch
                             {
                                 Console.WriteLine("Greska pri konekciji");
+                                serverPovukaoSert3 = true;
                             }
                             
 
@@ -103,7 +135,7 @@ namespace WCFClient
                             }
                             else
                             {
-                                Thread.Sleep(1000);
+                               // Thread.Sleep(1000);
                                 Console.WriteLine(proxy.AddToRevocationList(certificate));
                                 string msg = certificate.Thumbprint + " " + WindowsIdentity.GetCurrent().Name.Split('\\')[1];
                                 Writer.WriteMsg(msg);
@@ -111,43 +143,90 @@ namespace WCFClient
 
                             break;
                         case 5:
-                           
-                            
-                                proxy2 = new ClientProxyService(binding2, address2);
-                            
-                               
-                                string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-
-
-                                X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
-                                if (cert == null)
+                            try
+                            {
+                                if (serverPovukaoSert5)
                                 {
-                                    //Console.WriteLine("Nema sertifikata");
-                                    break;
-                                }
+                                    srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);//podesavanje serverskog sertifikataeateUpnIdentity("wcfservice"));
+                                    EndpointAddress address2nova = new EndpointAddress(new Uri("net.tcp://localhost:9998/IWcfService"),
+                                  new X509CertificateEndpointIdentity(srvCert));
 
-                                Console.WriteLine("Starting to ping server...");
-                                Random r = new Random();
-                                try
-                                {
-                                    int brojac = 0;
-                                    while (brojac < 10)
-                                    {
-                                        brojac++;
-                                        Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
-                                    
-                                        proxy2.PingServer(DateTime.Now);
-                                    
+                                    proxy2 = new ClientProxyService(binding2, address2nova);
+
+                                    string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                                    X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
+                                    if (cert == null)
+                                    {                                      
+                                        break;
                                     }
+
+                                    Console.WriteLine("Starting to ping server...");
+                                    Random r = new Random();
+                                    try
+                                    {
+                                        int brojac = 0;
+                                        while (brojac < 10)
+                                        {
+                                            brojac++;
+                                            Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
+
+                                            proxy2.PingServer(DateTime.Now);
+
+                                        }
+                                    }
+                                    catch
+                                    {                                      
+                                       // Console.WriteLine("Greska pri konekciji - ovdje sam");
+                                    }
+
+
+                                    CloseProxy(proxy2);
                                 }
-                                catch 
+                                else
                                 {
-                                    Console.WriteLine("Greska pri konekciji");
+                                    proxy2 = new ClientProxyService(binding2, address2); //nije podigao host ili povukao sertifikat
+
+                                    string name = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                                    X509Certificate2 cert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, name);
+                                    if (cert == null)
+                                    {
+                                        //Console.WriteLine("Nema sertifikata");
+                                        break;
+                                    }
+
+                                    Console.WriteLine("Starting to ping server...");
+                                    Random r = new Random();
+                                    try
+                                    {
+                                        int brojac = 0;
+                                        while (brojac < 10)
+                                        {
+                                            brojac++;
+                                            Thread.Sleep(r.Next(1, 10) * 1000); //sleep 1-10s
+                                   
+                                            proxy2.PingServer(DateTime.Now);
+                                          
+                                        }
+                                    }
+                                    catch
+                                    {
+                                     
+                                        //Console.WriteLine("Greska pri konekciji - 12");
+                                       
+                                    }
+
+
+                                    CloseProxy(proxy2);
                                 }
+                            }
+                            catch
+                            {
+                               
+                                Console.WriteLine("Greska pri konekciji.");
+                                serverPovukaoSert5 = true;
 
 
-                            CloseProxy(proxy2);
-
+                            }
                             break;
                      
                     }
@@ -169,18 +248,28 @@ namespace WCFClient
             while (true)
             {
                 int n = 0;
-                Thread.Sleep(2000);
+               // Thread.Sleep(2000);
                 try
                 {
-                    List<string> lista = Writer.Read();
+                    List<string> lista = Reader.Read();
                     foreach (string item in lista)
                     {
                         n++;
-                        if (n  - 1 == brojac) {
-                            Console.WriteLine("Klijent "+item.Split(' ')[1]+" je povukao sertifikat");
-                            brojac++;
-                            
+                        try
+                        {
+                            if (n - 1 == brojac)
+                            {
+
+                                Console.WriteLine("Klijent " + item.Split(' ')[1] + " je povukao sertifikat");
+                                brojac++;
+
+                            }
                         }
+                        catch
+                        {
+
+                        }
+                       
                         
                     }
                 }catch(Exception e)

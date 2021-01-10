@@ -54,14 +54,14 @@ namespace WCFClient
 
         public void PingServer(DateTime dt)
         {
-            try
-            {
+           // try
+           // {
                 factory.PingServer(dt);
 
-            }catch(Exception e)
-            {
-                Console.WriteLine("Exception: " + e.Message);
-            }
+           // }catch(Exception e)
+           // {
+           //     Console.WriteLine("Server se jos uvijek nije podigao");
+           // }
         }
 
         public string TestCommunication()

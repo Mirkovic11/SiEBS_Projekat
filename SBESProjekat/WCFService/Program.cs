@@ -18,9 +18,6 @@ namespace WCFService
     {
         static void Main(string[] args)
         {
-
-            
-
             Console.WriteLine("Korisnik koji je pokrenuo server: " + WindowsIdentity.GetCurrent().Name);
 
             LogData.InitializeServerEventLog();
@@ -50,21 +47,20 @@ namespace WCFService
                 
                 int option = 0;
                 string certName = "";
+                ServiceHost host=null;
 
                 do
                 {
-                    Console.WriteLine("--------------------------------------------------------------");
-                    Console.WriteLine("Izaberite opciju:");
-                    Console.WriteLine("1 za kreiranje sertifikata sa svim kljucevima");
-                    Console.WriteLine("2 za kreiranje sertifikata bez privatnog kljuca");
-                    Console.WriteLine("3 za podizanje servera");
-                    Console.WriteLine("4 za povlacenje sertifikata");
-                    Console.WriteLine("0 izlaz");
-                    Console.WriteLine("--------------------------------------------------------------");
-
-
-                    ServiceHost host = new ServiceHost(typeof(WcfSevice));
-
+                    Console.WriteLine("--------------------------------------------------------------\n" +
+                        "Izaberite opciju:" +
+                        "\n1 za kreiranje sertifikata sa svim kljucevima\n" +
+                        "2 za kreiranje sertifikata bez privatnog kljuca\n" +
+                        "3 za podizanje servera\n" +
+                        "4 za povlacenje sertifikata" +
+                        "\n0 izlaz\n--------------------------------------------------------------");
+               
+               
+               
                     int.TryParse(Console.ReadLine(), out option);
 
                     switch (option)
@@ -80,8 +76,11 @@ namespace WCFService
                             proxy.createCertificateWithoutPrivateKey("TestCA", certName);
                             break;
                         case 3:
+                            if (host == null || host.State == CommunicationState.Closed )
+                            {
 
-                            
+                                
+                            host = new ServiceHost(typeof(WcfSevice));
                             host.AddServiceEndpoint(typeof(IWcfService), binding2, address2);
 
                             string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
@@ -101,12 +100,6 @@ namespace WCFService
                                 host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
                                 host.Open();
 
-
-                                
-                                
-
-                               
-
                                 ServiceSecurityAuditBehavior audit = new ServiceSecurityAuditBehavior();
                                 audit.AuditLogLocation = AuditLogLocation.Application;
                                 host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
@@ -114,7 +107,34 @@ namespace WCFService
 
                                 Console.WriteLine("Server podignut");
                             }
+                            }else
+                            {
+                                //Console.WriteLine("Vec sam otvoren");
+                                string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
+                                List<string> Lista = new List<string>();
+                                bool nadjeno = false;
+                                string myName = WindowsIdentity.GetCurrent().Name.Split('\\')[1];
+                                X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, myName);
+
+                                if (certificate == null)
+                                {
+                                    Console.WriteLine("Nemate sertifikat");
+                                }
+                                else
+                                {
+                                    host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;//definisanje tipa validacije
+                                    host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);//dodajemo sertifikat na host, metoda GetCertificateFromStorage nam vraca sertifikat i podesava ga u Certificate (host.Credentials.ServiceCertificate.Certificat)
+                                    host.Open();
+
+                                    ServiceSecurityAuditBehavior audit = new ServiceSecurityAuditBehavior();
+                                    audit.AuditLogLocation = AuditLogLocation.Application;
+                                    host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+                                    host.Description.Behaviors.Add(audit);
+
+                                    Console.WriteLine("Server podignut");
+                                }
+                            }
 
                             break;
                         case 4:
@@ -125,17 +145,24 @@ namespace WCFService
                                 Console.WriteLine("Sertifikat je vec povucen");
                             }
                             else
-                            {
+                            { 
                                 Console.WriteLine(proxy.AddToRevocationList(certificate1));
+                                if (host == null)
+                                {                                  
+                                    break;
+                                }
+                                
+                                 host.Close();
                                
                             }
                             break;
-                       
+                          
                     }
+                    
                 } while (option != 0);
-
+                host.Close();
             }
-
+           
             Console.ReadLine();
 
         }
